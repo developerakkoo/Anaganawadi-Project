@@ -133,7 +133,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                     authProvider.login(
                                       emailController.text,
                                       passwordController.text,
-                                    );
+                                    )
 
                                      Navigator.pushNamed(context, '/childRegistration');
                                   }

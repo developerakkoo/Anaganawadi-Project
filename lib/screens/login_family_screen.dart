@@ -50,7 +50,9 @@ class _LoginFamilyScreenState extends State<LoginFamilyScreen> {
   }
 
   void _submitForm() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (_formKey.currentState!.validate()) {
+      authProvider.login()
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Form Submitted Successfully!")),
       );
