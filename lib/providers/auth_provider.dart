@@ -15,6 +15,14 @@ class AuthProvider extends ChangeNotifier {
       print("Login Successful!");
       print(email);
       print(password);
+
+      let object = {
+        email:email,
+        password:password
+
+      };
+
+      print(object);
     });
   }
 }
