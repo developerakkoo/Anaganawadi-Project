@@ -21,7 +21,7 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
   final TextEditingController attendanceController = TextEditingController();
   final TextEditingController assessmentsController = TextEditingController();
   final TextEditingController learningMilestonesController = TextEditingController();
-  
+
   String? gender;
   String? birthCertificate;
   String? disabilities;
@@ -33,9 +33,8 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
 
   void _nextPage() {
     if (_formKey.currentState!.validate()) {
-      if (_currentPage < 3) {
-        _pageController.nextPage(
-            duration: Duration(milliseconds: 500), curve: Curves.ease);
+      if (_currentPage < 4) {
+        _pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
         setState(() {
           _currentPage++;
         });
@@ -47,8 +46,7 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
 
   void _previousPage() {
     if (_currentPage > 0) {
-      _pageController.previousPage(
-          duration: Duration(milliseconds: 500), curve: Curves.ease);
+      _pageController.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
       setState(() {
         _currentPage--;
       });
@@ -78,29 +76,32 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
                   controller: _pageController,
                   physics: NeverScrollableScrollPhysics(),
                   children: [
-                    _buildSlide([
+                    _buildSlide("Personal Details", [
                       _buildTextField(nameController, "Full Name", Icons.person, "Name is required"),
                       _buildDropdownField("Gender", ["Male", "Female"], (val) => gender = val),
                       _buildTextField(dobController, "DOB", Icons.cake, "Enter your Date of Birth"),
                       _buildDropdownField("Birth Certificate", ["Yes", "No"], (val) => birthCertificate = val),
                     ]),
-                    _buildSlide([
+                    _buildSlide("Contact Details", [
                       _buildTextField(heightController, "Height (Feet)", Icons.height, "Enter height"),
                       _buildTextField(weightController, "Weight (Kg)", Icons.scale, "Enter weight"),
                       _buildDropdownField("Immunization Status", ["Yes", "No"], (val) => immunizationStatus = val),
                       _buildDropdownField("Disabilities", ["Yes", "No"], (val) => disabilities = val),
                     ]),
-                    _buildSlide([
+                    _buildSlide("Location Details", [
                       _buildTextField(healthConditionsController, "Health Conditions", Icons.local_hospital, "Enter health conditions"),
                       _buildTextField(attendanceController, "Attendance", Icons.calendar_today, "Required"),
                       _buildDropdownField("Participates in Activities", ["True", "False"], (val) => participatesInActivities = val),
                       _buildDropdownField("Receives Midday Meals", ["Yes", "No"], (val) => middayMeals = val),
                     ]),
-                    _buildSlide([
+                    _buildSlide("Location Details", [
                       _buildDropdownField("Child Role in Family", ["Son", "Daughter"], (val) => childRole = val),
                       _buildTextField(assessmentsController, "Development Assessments", Icons.assessment, "Enter assessment details"),
                       _buildDropdownField("Physical Activity", ["Active", "Not Active"], (val) => physicalActivity = val),
                       _buildTextField(learningMilestonesController, "Learning Milestones", Icons.school, "Enter milestones"),
+                    ]),
+                    _buildSlide("Additional Details", [
+                      _buildTextField(TextEditingController(), "Other Information", Icons.info, "Enter additional info"),
                     ]),
                   ],
                 ),
@@ -109,18 +110,31 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _currentPage > 0
-                      ? ElevatedButton(
+                      ? ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey),
+                            backgroundColor: Colors.grey,
+                            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                          ),
                           onPressed: _previousPage,
-                          child: Text("Back", style: TextStyle(color: Colors.white)),
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          label: Text("Back", style: TextStyle(color: Colors.white, fontSize: 18)),
                         )
                       : SizedBox(),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo),
-                    onPressed: _nextPage,
-                    child: Text(_currentPage == 3 ? "Submit" : "Next", style: TextStyle(color: Colors.white)),
+                      backgroundColor: Colors.indigo,
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    ),
+                    onPressed:() {
+                      if (_currentPage == 4) {
+                      Navigator.pushNamed(context, '/dashboard');
+                       print("Form Submitted! Navigate to the next page.");
+                    } else {
+                  _nextPage();
+                 }
+               },
+                    icon: Icon(Icons.arrow_forward, color: Colors.white),
+                    label: Text(_currentPage == 4 ? "Submit" : "Next", style: TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ],
               ),
@@ -132,16 +146,24 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
     );
   }
 
-  Widget _buildSlide(List<Widget> fields) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: fields.map((field) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
-          child: field,
-        )).toList(),
+  Widget _buildSlide(String title, List<Widget> fields) {
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              title,
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.indigo),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            ...fields.map((field) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: field,
+                )),
+          ],
+        ),
       ),
     );
   }

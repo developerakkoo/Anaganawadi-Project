@@ -8,21 +8,17 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Simulating HTTP Request with a Delay
     Future.delayed(Duration(seconds: 2), () {
       _isLoading = false;
       notifyListeners();
-      print("Login Successful!");
-      print(email);
-      print(password);
 
-      let object = {
-        email:email,
-        password:password
-
+      Map<String, String> object = {
+        "E-mail": email,
+        "Password": password,
       };
 
-      print(object);
+      print(object); 
+
     });
   }
 }

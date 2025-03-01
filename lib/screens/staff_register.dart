@@ -69,7 +69,7 @@ class _RegisterStaffScreenState extends State<RegisterStaffScreen> {
                   controller: _pageController,
                   physics: NeverScrollableScrollPhysics(),
                   children: [
-                    _buildSlide([
+                    _buildSlide("Personal Details",[
                       _buildTextField(nameController, "Full Name", Icons.person, "Name is required"),
                       SizedBox(height: 18.0),
                       _buildTextField(emailController, "Email", Icons.email, "Enter a valid email", keyboardType: TextInputType.emailAddress),
@@ -80,7 +80,7 @@ class _RegisterStaffScreenState extends State<RegisterStaffScreen> {
                       SizedBox(height: 18.0),
 
                     ]),
-                    _buildSlide([
+                    _buildSlide("Location Details",[
                       _buildDropdown(["USA", "India", "UK"], "Country", country, (String? val) => setState(() => country = val)),
                       SizedBox(height: 18.0),
                       _buildDropdown(["Maharastra", "Delhi"], "State", state, (String? val) => setState(() => state = val)),
@@ -90,7 +90,7 @@ class _RegisterStaffScreenState extends State<RegisterStaffScreen> {
                       _buildDropdown(["Sangli", "Kolhapur"], "District", district, (String? val) => setState(() => district = val)),
                       SizedBox(height: 18.0),
                     ]),
-                    _buildSlide([
+                    _buildSlide("Location Details", [
                      _buildDropdown(["Miraj", "Shirala"], "Taluka/Tehsil", talukaTehsil, (String? val) => setState(() => talukaTehsil = val)),
                      SizedBox(height: 18.0),
                      _buildDropdown(["Bus Stand", "railway Station"], "Block", block, (String? val) => setState(() => block = val)),
@@ -100,7 +100,7 @@ class _RegisterStaffScreenState extends State<RegisterStaffScreen> {
                      _buildDropdown(["Pune Vidhansabha", "Sangli Vidhansabha"], "Vidhansabha Constituency", vidhansabhaConstituency, (String? val) => setState(() => vidhansabhaConstituency = val)),
                      SizedBox(height: 18.0),
                     ]),
-                    _buildSlide([
+                    _buildSlide("Location Details", [
                      _buildDropdown(["Sector1", "Sector2"], "Sector", sector, (String? val) => setState(() => sector = val)),
                      SizedBox(height: 18.0),
                      _buildDropdown(["Ambegaon", "Baramati"], "Gram Panchayat", gramPanchayat, (String? val) => setState(() => gramPanchayat = val)),
@@ -110,7 +110,7 @@ class _RegisterStaffScreenState extends State<RegisterStaffScreen> {
                      _buildDropdown(["Mahila Bal Vikas", "PASHAN ANGANWADI"], "Anganwadi", anganwadi, (String? val) => setState(() => anganwadi = val)),
                      SizedBox(height: 18.0),
                     ]),
-                    _buildSlide([
+                    _buildSlide("Location Details", [
                       _buildTextField(pincodeController, "Pincode", Icons.pin_drop, "Enter valid pincode", keyboardType: TextInputType.number),
                       SizedBox(height: 18.0),
                       _buildDropdown(["Admin", "User"], "Role", role, (String? val) => setState(() => role = val)),
@@ -125,16 +125,31 @@ class _RegisterStaffScreenState extends State<RegisterStaffScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _currentPage > 0
-                      ? ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+                      ? ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                          ),
                           onPressed: _previousPage,
-                          child: Text("Back", style: TextStyle(color: Colors.white)),
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          label: Text("Back", style: TextStyle(color: Colors.white, fontSize: 18)),
                         )
                       : SizedBox(),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo),
-                    onPressed: _nextPage,
-                    child: Text(_currentPage == 4 ? "Submit" : "Next", style: TextStyle(color: Colors.white)),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo,
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    ),
+                    onPressed: () {
+                      if (_currentPage == 4) {
+                      Navigator.pushNamed(context, '/dashboard');
+                       print("Form Submitted! Navigate to the next page.");
+                    } else {
+                  _nextPage();
+                 }
+               },
+                    icon: Icon(Icons.arrow_forward, color: Colors.white),
+                    label: Text(_currentPage == 4 ? "Submit" : "Next", style: TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ],
               ),
@@ -145,7 +160,6 @@ class _RegisterStaffScreenState extends State<RegisterStaffScreen> {
       ),
     );
   }
-}
 
 Widget _buildDropdown(List<String> items, String label, String? selectedValue, ValueChanged<String?> onChanged) {
   return DropdownButtonFormField<String>(
@@ -167,7 +181,20 @@ Widget _buildTextField(TextEditingController controller, String label, IconData 
   );
 }
 
-Widget _buildSlide(List<Widget> children) {
-  return Column(mainAxisAlignment: MainAxisAlignment.center, children: children);
+Widget _buildSlide(String title, List<Widget> children) {
+  return Center(
+    child: Column(
+     mainAxisAlignment: MainAxisAlignment.center, // Centers content vertically
+     crossAxisAlignment: CrossAxisAlignment.center, // Centers content horizontally
+     children: [
+      Text(
+        title,
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.indigo),
+      ),
+      SizedBox(height: 20),
+      ...children,
+    ],
+    ),
+  );
 }
-
+}

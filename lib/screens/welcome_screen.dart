@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindlabryinth/providers/auth_provider.dart';
-import 'dart:async';
+import 'package:card_swiper/card_swiper.dart';
 import 'package:provider/provider.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -11,7 +11,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  double topPosition = 0.0; // Initially center
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -24,199 +23,180 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    // Start animation after a slight delay
-    Future.delayed(Duration(milliseconds: 500), () {
-      setState(() {
-        topPosition = 50.0; // Move to the top
-      });
-    });
-
-    // Navigate to next screen after 3 sec
-    // Timer(Duration(seconds: 3), () {
-    //   Navigator.pushReplacement(
-    //     context,
-    //     MaterialPageRoute(builder: (context) => HomeScreen()),
-    //   );
-    // });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.0),
-          child: SizedBox(
-            height: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Form(
-                    key: _formKey,
-                    onChanged: validateForm, // Validate on form change
-                    child: SizedBox(
-                      height: double.infinity,
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Login Form Title
-                          Text(
-                            "Welcome to Mindlabryinth",
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.indigo,
-                            ),
-                          ),
-                          SizedBox(height: 20),
+        child: Column(
+          children: [
+            // 🔹 Swiper Section (Fixed at the top)
+            SizedBox(
+              height: 200, // Fixed height for the swiper
+              child: Swiper(
+                itemCount: 3,
+                autoplay: true,
+                pagination: const SwiperPagination(),
+                itemBuilder: (context, index) {
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 5,
+                    child: Center(
+                      child: Text(
+                        "Carousel Slide ${index + 1}",
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
 
-                          // Email Input Field
-                          TextFormField(
-                            controller: emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: "Email",
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.email),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Email is required";
-                              } else if (!RegExp(
-                                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-                              ).hasMatch(value)) {
-                                return "Enter a valid email";
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Form(
+                  key: _formKey,
+                  onChanged: validateForm,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 40),
 
-                          // Password Input Field
-                          TextFormField(
-                            controller: passwordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: "Password",
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.lock),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Password is required";
-                              } else if (value.length < 6) {
-                                return "Password must be at least 6 characters";
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 20),
+                      // 🔹 Welcome Text
+                      const Text(
+                        "Welcome to Mindlabryinth",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.indigo,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
 
-                          // Login Button with Loading Indicator
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.indigo,
-                              minimumSize: Size(double.infinity, 50),
-                            ),
-                            onPressed: isFormValid && !authProvider.isLoading
-                                ? () {
-                                    authProvider.login(
-                                      emailController.text,
-                                      passwordController.text,
-                                    )
+                      const SizedBox(height: 20),
 
-                                     Navigator.pushNamed(context, '/childRegistration');
-                                  }
-                                : null, // Disabled when form is invalid or loading
-                            child: authProvider.isLoading
-                                ? CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : Text(
-                                    "Login",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
+                      // 🔹 Email Field
+                      TextFormField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: "Email",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.email),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Email is required";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
 
-                          SizedBox(height: 20),
+                      // 🔹 Password Field
+                      TextFormField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: "Password",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.lock),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Password is required";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
 
-                          // Register Buttons
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              minimumSize: Size(double.infinity, 50),
-                            ),
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, '/familyRegistration');
-                            },
-                            child: Text(
-                              "Register as Family",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              minimumSize: Size(double.infinity, 50),
-                            ),
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, '/staffRegistration');
-                            },
-                            child: Text(
-                              "Register as Staff",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(height: 20),
-
-                          // Centered Text Below Buttons
-                          Text(
-                            "Or continue as a guest",
+                      // 🔹 Forgot Password (Right Aligned)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/forgotPassword');
+                          },
+                          child: const Text(
+                            "Forgot password?",
                             style: TextStyle(
                               fontSize: 16,
+                              color: Colors.blue,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-
-                          Spacer(),
-
-                          // Footer
-                          Text(
-                            "Powered by Techlapse",
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                          SizedBox(height: 20),
-                        ],
+                        ),
                       ),
-                    ),
+
+                      const SizedBox(height: 20),
+
+                      // 🔹 Login Button
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.indigo,
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        onPressed: isFormValid && !authProvider.isLoading
+                            ? () {
+                                authProvider.login(
+                                  emailController.text,
+                                  passwordController.text,
+                                );
+                                Navigator.pushNamed(context, '/childRegistration');
+                              }
+                            : null,
+                        child: authProvider.isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text("Login", style: TextStyle(fontSize: 18, color: Colors.white)),
+                      ),
+                      const SizedBox(height: 15),
+
+                      const Text(
+                        "OR",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      // 🔹 Register Buttons
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/familyRegistration');
+                        },
+                        child: const Text("Register as Family", style: TextStyle(fontSize: 18, color: Colors.white)),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/staffRegistration');
+                        },
+                        child: const Text("Register as Staff", style: TextStyle(fontSize: 18, color: Colors.white)),
+                      ),
+                      const SizedBox(height: 90),
+
+                      // 🔹 Footer
+                      const Text("Powered by Techlapse", style: TextStyle(fontSize: 14, color: Colors.grey)),
+                      const SizedBox(height: 20),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

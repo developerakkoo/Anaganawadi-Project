@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindlabryinth/providers/auth_provider.dart';
 import 'package:mindlabryinth/screens/child_register.dart';
+import 'package:mindlabryinth/screens/dashboard.dart';
 import 'package:mindlabryinth/screens/login_family_screen.dart';
 import 'package:mindlabryinth/screens/staff_register.dart';
 import 'package:mindlabryinth/screens/welcome_screen.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/familyRegistration': (context) => LoginFamilyScreen(),
         '/staffRegistration': (context) => RegisterStaffScreen(),
         '/childRegistration': (context) => RegisterChildScreen(),
+        '/dashboard': (context) => DashScreen(),
       },
     );
   }
