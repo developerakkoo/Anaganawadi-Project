@@ -82,7 +82,7 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
                       _buildTextField(dobController, "DOB", Icons.cake, "Enter your Date of Birth"),
                       _buildDropdownField("Birth Certificate", ["Yes", "No"], (val) => birthCertificate = val),
                     ]),
-                    _buildSlide("Contact Details", [
+                    _buildSlide("Personal Details", [
                       _buildTextField(heightController, "Height (Feet)", Icons.height, "Enter height"),
                       _buildTextField(weightController, "Weight (Kg)", Icons.scale, "Enter weight"),
                       _buildDropdownField("Immunization Status", ["Yes", "No"], (val) => immunizationStatus = val),
@@ -94,7 +94,7 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
                       _buildDropdownField("Participates in Activities", ["True", "False"], (val) => participatesInActivities = val),
                       _buildDropdownField("Receives Midday Meals", ["Yes", "No"], (val) => middayMeals = val),
                     ]),
-                    _buildSlide("Location Details", [
+                    _buildSlide("Other Details", [
                       _buildDropdownField("Child Role in Family", ["Son", "Daughter"], (val) => childRole = val),
                       _buildTextField(assessmentsController, "Development Assessments", Icons.assessment, "Enter assessment details"),
                       _buildDropdownField("Physical Activity", ["Active", "Not Active"], (val) => physicalActivity = val),

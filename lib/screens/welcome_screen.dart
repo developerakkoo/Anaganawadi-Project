@@ -148,7 +148,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   emailController.text,
                                   passwordController.text,
                                 );
-                                Navigator.pushNamed(context, '/childRegistration');
+                                Navigator.pushNamed(context, '/dashboard');
                               }
                             : null,
                         child: authProvider.isLoading
