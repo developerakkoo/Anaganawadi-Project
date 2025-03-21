@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:mindlabryinth/screens/api_service.dart';
+import 'child_register.dart';
 
 class DashScreen extends StatefulWidget {
   const DashScreen({super.key});
@@ -51,21 +54,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+    // Create an instance of ApiService
+  final ApiService apiService = ApiService();
+  
+ // After user logs in and receives a token
+ final String token = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0X3dvcmtlcl8xIiwiZXhwIjoxNzQzMDAxMzQ5LCJpYXQiOjE3NDIzOTY1NDksImF1dGhvcml0aWVzIjpbIkFOR0FOV0FESV9XT1JLRVIiLCJBVCIsIk1DIiwiUERBIiwiVFYiLCJVQSIsIlVWIiwiVkMiLCJWVCIsIlZXIl19.LxMZQFcO33zFhMJqKV6AAyYOD0TOC3c6HPT0TySs0_7CaQIIsQ9pFRgLJqxvvvqMkXCOUyFvXPH7pq1PR03DOuo7fT9boTTiU_QZyMchv9bEoAj_Y5UY-x1QEnTnocl4OQi0oQGkd652Irava6PpKMr55OrH_C0V2DTlav4nt13_l0o16TfBSUHTXnq_fHrHLKgKjuARcIDyxOlUZfxueIQt__5tORwB1YW12ej17IlZH_9X4xePJzvoBAiTshZAmqjd8HlfQWhwg2mgmgAW2f1GnJABC7Gu_LEjgADodpuJRAepU2LdKuNgeyAFnpjgvLADu5ZZVDuqGMkl1DFTFcLU68lkVlOao9PQolAXFBbtC95tpsx673cq_Xc0fxDqjb7QnLn0iK26HaDDWo1Sdt2txHTi6eUHTUkr1A7SQF3XPNZCnWj2ghNmzBVN_934JRRrXUcjEDw1cc0D01r7zKOrZHOOpUNa6QWExsiFdVn4VIcqB1slOsvrpG6lJGWjAHATyNTSPFVzn-nNTzdaSyouMqbG1frO8abzSmd5S4dMcyP16ULcExC7xYS4QL0e4NN2S29I1j5MCcqWSQW8duIIgCc64uQF0m3BWlsPA5oTzf_cB7q-QnyVbuZrYYV-y712-1UWzxxA_1BpwhBFJWt4Pd8KW4mwSX-B6eQMxLM';
+
+  @override
+  void initState() {
+    super.initState();
+    print("Setting token: $token");
+    // Set the token after the user logs in
+    apiService.setToken(token);
+  }
+
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) _updateProfileImage(File(pickedFile.path));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final pages = [
-      _buildDashboardPage(),
-      ProfileSection(imageFile: _imageFile, onImagePicked: _updateProfileImage, pickImageFunction: _pickImage),
-      VaccinationSection(),
-      ActivitySection(),
-      GuideSection(),
-      SettingsSection(isDarkMode: widget.isDarkMode, toggleTheme: widget.toggleTheme),
-    ];
+@override
+Widget build(BuildContext context) {
+  final pages = [
+    _buildDashboardPage(),
+    ProfileSection(imageFile: _imageFile, onImagePicked: _updateProfileImage, pickImageFunction: _pickImage),
+    VaccinationSection(),
+    ActivitySection(apiService: apiService), // Pass the ApiService instance here
+    RegisterChildScreen(apiService: apiService,),
+    SettingsSection(isDarkMode: widget.isDarkMode, toggleTheme: widget.toggleTheme),
+  ];
 
     return Scaffold(
       appBar: AppBar(
@@ -77,7 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: CircleAvatar(
               backgroundImage: _imageFile != null
                   ? FileImage(_imageFile!)
-                  : AssetImage('assets/profile.png') as ImageProvider,
+                  : AssetImage('assets/profilenew.png') as ImageProvider,
             ),
           ),
         ],
@@ -95,10 +112,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     radius: 30,
                     backgroundImage: _imageFile != null
                         ? FileImage(_imageFile!)
-                        : AssetImage('assets/profile.png') as ImageProvider,
+                        : AssetImage('assets/profilenew.png') as ImageProvider,
                   ),
                   SizedBox(height: 8),
-                  Text('Welcome, User', style: TextStyle(color: Colors.white, fontSize: 20)),
+                  Text('Welcome, Varun', style: TextStyle(color: Colors.white, fontSize: 20)),
                 ],
               ),
             ),
@@ -106,7 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(leading: Icon(Icons.person), title: Text('Profile'), onTap: () => setState(() => _selectedIndex = 1)),
             ListTile(leading: Icon(Icons.vaccines), title: Text('Vaccination'), onTap: () => setState(() => _selectedIndex = 2)),
             ListTile(leading: Icon(Icons.local_activity), title: Text('Activity'), onTap: () => setState(() => _selectedIndex = 3)),
-            ListTile(leading: Icon(Icons.menu_book), title: Text('Guide'), onTap: () => setState(() => _selectedIndex = 4)),
+            ListTile(leading: Icon(Icons.child_care), title: Text('Child'), onTap: () => setState(() => _selectedIndex = 4)),
             ListTile(leading: Icon(Icons.settings), title: Text('Settings'), onTap: () => setState(() => _selectedIndex = 5)),
           ],
         ),
@@ -129,7 +146,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 radius: 30,
                 backgroundImage: _imageFile != null
                     ? FileImage(_imageFile!)
-                    : AssetImage('assets/profile.png') as ImageProvider,
+                    : AssetImage('assets/profilenew.png') as ImageProvider,
               ),
             ],
           ),
@@ -184,33 +201,150 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-class VaccinationSection extends StatelessWidget {
+class VaccinationSection extends StatefulWidget {
   const VaccinationSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Vaccination Section', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-    );
-  }
+  State<VaccinationSection> createState() => _VaccinationSectionState();
 }
 
-// class ActivitySection extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Text('Activity Section', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-//     );
-//   }
-// }
+class _VaccinationSectionState extends State<VaccinationSection> {
+  final List<TextEditingController> _vaccineControllers = [];
+  final List<DateTime?> _selectedDates = [];
+  final List<TimeOfDay?> _selectedTimes = [];
 
-class GuideSection extends StatelessWidget {
-  const GuideSection({super.key});
+  void _addSchedule() {
+    setState(() {
+      _vaccineControllers.add(TextEditingController());
+      _selectedDates.add(null);
+      _selectedTimes.add(null);
+    });
+  }
+
+  void _removeSchedule(int index) {
+    setState(() {
+      _vaccineControllers[index].dispose();
+      _vaccineControllers.removeAt(index);
+      _selectedDates.removeAt(index);
+      _selectedTimes.removeAt(index);
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context, int index) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDates[index] = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context, int index) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedTimes[index] = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Guide Section', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Vaccination Schedule',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _addSchedule,
+            child: const Text('Add Vaccination Schedule'),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _vaccineControllers.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: _vaccineControllers[index],
+                          decoration: const InputDecoration(
+                            labelText: 'Vaccine Name',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () => _selectDate(context, index),
+                                child: Text(
+                                  _selectedDates[index] == null
+                                      ? 'Select Date'
+                                      : 'Date: ${_selectedDates[index]!.toLocal()}'.split(' ')[0],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () => _selectTime(context, index),
+                                child: Text(
+                                  _selectedTimes[index] == null
+                                      ? 'Select Time'
+                                      : 'Time: ${_selectedTimes[index]!.format(context)}',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => _removeSchedule(index),
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                              child: const Text('Remove'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Vaccination Scheduled')),
+                                );
+                              },
+                              child: const Text('Confirm Schedule'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -262,10 +396,10 @@ class ProfileSection extends StatefulWidget {
 
 class _ProfileSectionState extends State<ProfileSection> {
   bool _isEditing = false;
-  String _name = 'Johan Due';
+  String _name = 'Varun';
   String _role = 'Staff';
   String _mob = '1234567890';
-  String _email = 'user.email@example.com';
+  String _email = 'user@gmail.com';
   String _pass = '123456';
 
   @override
@@ -287,7 +421,7 @@ class _ProfileSectionState extends State<ProfileSection> {
               radius: 50,
               backgroundImage: widget.imageFile != null
                   ? FileImage(widget.imageFile!)
-                  : AssetImage('assets/profile.png') as ImageProvider,
+                  : AssetImage('assets/profilenew.png') as ImageProvider,
             ),
           ),
           SizedBox(height: 16),
@@ -347,9 +481,12 @@ class _ProfileSectionState extends State<ProfileSection> {
     );
   }
 }
-// Updated Activity section with dynamic form functionality and improved error handling
+
+// Activity Section --
 class ActivitySection extends StatefulWidget {
-  const ActivitySection({super.key});
+  final ApiService apiService;
+
+  const ActivitySection({super.key, required this.apiService});
 
   @override
   _ActivitySectionState createState() => _ActivitySectionState();
@@ -364,13 +501,13 @@ class _ActivitySectionState extends State<ActivitySection> {
     _addActivityForm(); // Initialize with one form
   }
 
-  void _addActivityForm() {
-    setState(() => _activityForms.add(ActivityForm(
-          key: UniqueKey(),
-          onRemove: () => _removeActivityForm(_activityForms.length - 1),
-        )));
-  }
-
+void _addActivityForm() {
+  setState(() => _activityForms.add(ActivityForm(
+        key: UniqueKey(),
+        onRemove: () => _removeActivityForm(_activityForms.length - 1),
+        apiService: widget.apiService, // Pass the ApiService instance
+      )));
+}
   void _removeActivityForm(int index) {
     setState(() => _activityForms.removeAt(index));
   }
@@ -392,11 +529,11 @@ class _ActivitySectionState extends State<ActivitySection> {
     );
   }
 }
-
 class ActivityForm extends StatefulWidget {
   final VoidCallback? onRemove;
+  final ApiService apiService;
 
-  const ActivityForm({super.key, this.onRemove});
+  const ActivityForm({super.key, this.onRemove, required this.apiService});
 
   @override
   _ActivityFormState createState() => _ActivityFormState();
@@ -435,6 +572,174 @@ class _ActivityFormState extends State<ActivityForm> {
       initialTime: TimeOfDay.now(),
     );
     if (picked != null) setState(() => _selectedTime = picked);
+  }
+
+  void _submitActivity() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Check if the token is set
+        if (widget.apiService.token == null || widget.apiService.token!.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Authentication required. Please log in again.")),
+          );
+          return;
+        }
+
+        // Format the time in 24-hour format (HH:mm:ss)
+        final formattedTime = _selectedTime!.format(context); // e.g., "3:37 PM"
+        final timeParts = formattedTime.split(":"); // Split into ["3", "37 PM"]
+        final hourPart = timeParts[0].trim(); // Extract hour part and remove spaces
+        final minuteAndPeriod = timeParts[1].trim().split(" "); // Split into ["37", "PM"]
+
+        // Extract minute and period
+        final minute = minuteAndPeriod[0]; // "37"
+        final period = minuteAndPeriod[1]; // "PM"
+
+        // Parse hour and minute as integers
+        final hour = int.parse(hourPart);
+        final minuteInt = int.parse(minute);
+
+        // Convert to 24-hour format
+        int hour24 = hour;
+        if (period == "PM" && hour != 12) {
+          hour24 += 12;
+        } else if (period == "AM" && hour == 12) {
+          hour24 = 0;
+        }
+
+        // Format as HH:mm:ss
+        final formatted24HourTime = "${hour24.toString().padLeft(2, '0')}:${minuteInt.toString().padLeft(2, '0')}:00";
+
+        // Debug log to verify the formatted time
+        print("Formatted 24-hour time: $formatted24HourTime");
+
+        // Prepare the data to be sent to the API
+        final Map<String, dynamic> activityData = {
+          "activityTitle": _titleController.text,
+          "description": _descriptionController.text,
+          "activityScheduledDate": _selectedDate!.toIso8601String().split('T')[0], // Format: YYYY-MM-DD
+          "activityScheduledTime": formatted24HourTime, // Format: HH:mm:ss
+          "isCompleted": false,
+          "anganwadiId": int.parse(_selectedAnganwadiId),
+          "steps": _stepControllers.map((controller) => controller.text).toList(),
+        };
+
+        // Call the API to submit the activity
+        await widget.apiService.activitySection(activityData);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Activity Scheduled Successfully!")),
+        );
+
+        // Open the _showSubmitForm after successful submission
+        _showSubmitForm();
+      } catch (e) {
+        // Show error message if something goes wrong
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${e.toString()}")),
+        );
+      }
+    }
+  }
+
+  void _showSubmitForm() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.9, // Almost full screen
+          minChildSize: 0.5,
+          maxChildSize: 1.0,
+          builder: (context, scrollController) {
+            final formKey = GlobalKey<FormState>();
+            final TextEditingController titleController = TextEditingController(text: 'Guide for the activity to perform the Alphabets Puzzle');
+            final TextEditingController descriptionController = TextEditingController(text: 'To perform Alphabets Puzzle activity');
+            final TextEditingController ageGroupController = TextEditingController(text: '10-12');
+
+            return Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Guide Activity", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        controller: titleController,
+                        decoration: InputDecoration(labelText: "Guide Title"),
+                        validator: (value) => value!.isEmpty ? "Title is required" : null,
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        controller: descriptionController,
+                        decoration: InputDecoration(labelText: "Guide Description"),
+                        validator: (value) => value!.isEmpty ? "Description is required" : null,
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        controller: ageGroupController,
+                        decoration: InputDecoration(labelText: "Age Group"),
+                        validator: (value) => value!.isEmpty ? "Age Group is required" : null,
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            try {
+                              // Prepare the data to be sent to the API
+                              final Map<String, dynamic> guideData = {
+                                "ageGroup": ageGroupController.text,
+                                "description": descriptionController.text,
+                                "title": titleController.text,
+                              };
+
+                              // Call the API to submit the guide
+                              await widget.apiService.activityGuide(guideData);
+
+                              // Show success message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Guide Submitted Successfully!")),
+                              );
+
+                              // Close the bottom sheet
+                              Navigator.pop(context);
+                            } catch (e) {
+                              // Show error message if something goes wrong
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Error: ${e.toString()}")),
+                              );
+                            }
+                          }
+                        },
+                        child: Text("Submit"),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -513,13 +818,19 @@ class _ActivityFormState extends State<ActivityForm> {
                       ),
                     ],
                   )),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: _addStep,
-                  icon: Icon(Icons.add),
-                  label: Text('Add Step'),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton.icon(
+                    onPressed: _addStep,
+                    icon: Icon(Icons.add),
+                    label: Text('Add Step'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _submitActivity,
+                    child: Text('Submit'),
+                  ),
+                ],
               ),
             ],
           ),

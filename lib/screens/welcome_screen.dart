@@ -12,7 +12,7 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isFormValid = false;
 
@@ -32,9 +32,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // 🔹 Swiper Section (Fixed at the top)
+            // Swiper Section
             SizedBox(
-              height: 200, // Fixed height for the swiper
+              height: 200,
               child: Swiper(
                 itemCount: 3,
                 autoplay: true,
@@ -67,9 +67,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     children: [
                       const SizedBox(height: 40),
 
-                      // 🔹 Welcome Text
+                      // Welcome Text
                       const Text(
-                        "Welcome to Mindlabryinth",
+                        "Welcome to Mindlabyrinth",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -80,25 +80,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                       const SizedBox(height: 20),
 
-                      // 🔹 Email Field
+                      // Email Field
                       TextFormField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
+                        controller: nameController,
+                        keyboardType: TextInputType.text,
                         decoration: const InputDecoration(
-                          labelText: "Email",
+                          labelText: "UserName",
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.email),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Email is required";
+                            return "User Name is required";
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 10),
 
-                      // 🔹 Password Field
+                      // Password Field
                       TextFormField(
                         controller: passwordController,
                         obscureText: true,
@@ -116,7 +116,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       const SizedBox(height: 10),
 
-                      // 🔹 Forgot Password (Right Aligned)
+                      // Forgot Password (Right Aligned)
                       Align(
                         alignment: Alignment.centerRight,
                         child: GestureDetector(
@@ -136,19 +136,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                       const SizedBox(height: 20),
 
-                      // 🔹 Login Button
+                      // Display error message if any
+                      if (authProvider.errorMessage.isNotEmpty)
+                        Text(
+                          authProvider.errorMessage,
+                          style: const TextStyle(color: Colors.red, fontSize: 16),
+                        ),
+
+                      // Login Button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.indigo,
                           minimumSize: const Size(double.infinity, 50),
                         ),
                         onPressed: isFormValid && !authProvider.isLoading
-                            ? () {
-                                authProvider.login(
-                                  emailController.text,
+                            ? () async {
+                                await authProvider.login(
+                                  nameController.text,
                                   passwordController.text,
                                 );
-                                Navigator.pushNamed(context, '/dashboard');
+                                if (authProvider.errorMessage.isEmpty) {
+                                  Navigator.pushNamed(context, '/dashboard');
+                                }
                               }
                             : null,
                         child: authProvider.isLoading
@@ -164,7 +173,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                       const SizedBox(height: 15),
 
-                      // 🔹 Register Buttons
+                      // Register Buttons
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -186,9 +195,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         },
                         child: const Text("Register as Staff", style: TextStyle(fontSize: 18, color: Colors.white)),
                       ),
-                      const SizedBox(height: 90),
+                      const SizedBox(height: 100),
 
-                      // 🔹 Footer
+                      // Footer
                       const Text("Powered by Techlapse", style: TextStyle(fontSize: 14, color: Colors.grey)),
                       const SizedBox(height: 20),
                     ],

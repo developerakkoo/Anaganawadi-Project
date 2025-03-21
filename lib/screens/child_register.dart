@@ -1,7 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:mindlabryinth/providers/auth_provider.dart';
+import 'package:mindlabryinth/screens/api_service.dart';
+import 'package:mindlabryinth/screens/dashboard.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()), // Register Provider
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: DashScreen(),
+      routes: {
+        '/dashboard': (context) => DashScreen(), // Define the route for the dashboard
+      },
+    );
+  }
+}
 
 class RegisterChildScreen extends StatefulWidget {
-  const RegisterChildScreen({super.key});
+  const RegisterChildScreen({super.key, required ApiService apiService});
 
   @override
   State<RegisterChildScreen> createState() => _RegisterChildScreenState();
@@ -13,6 +43,8 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
   int _currentPage = 0;
 
   // Controllers
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
@@ -30,6 +62,8 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
   String? physicalActivity;
   String? participatesInActivities;
   String? immunizationStatus;
+
+  final ApiService _apiService = ApiService(); 
 
   void _nextPage() {
     if (_formKey.currentState!.validate()) {
@@ -53,13 +87,49 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
     }
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+void _submitForm() async {
+  if (_formKey.currentState!.validate()) {
+    // Prepare the JSON data
+    final Map<String, dynamic> childData = {
+      "name": nameController.text,
+      "gender": gender,
+      "dob": dobController.text,
+      "birthCertificateNumber": birthCertificate,
+      "height": double.tryParse(heightController.text) ?? 0.0,
+      "weight": double.tryParse(weightController.text) ?? 0.0,
+      "immunizationStatus": immunizationStatus,
+      "disabilities": disabilities,
+      "healthConditions": healthConditionsController.text,
+      "attendance": attendanceController.text,
+      "participatesInActivities": participatesInActivities == "True",
+      "receivesMiddayMeals": middayMeals == "Yes",
+      "childRoleInFamily": childRole,
+      "developmentAssessments": assessmentsController.text,
+      "physicalActivity": physicalActivity,
+      "learningMilestones": learningMilestonesController.text,
+      "parentFeedback": "Improving", // You can add a field for this if needed
+      "anganwadiWorkerFeedback": "Good Progress", // You can add a field for this if needed
+    };
+
+    try {
+      // Call the API to register the child
+      await _apiService.registerChild(childData);
+
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Form Submitted Successfully!")),
+        SnackBar(content: Text("Child registered successfully!")),
+      );
+
+      // Navigate to the dashboard
+      Navigator.pushNamed(context, '/dashboard');
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to register child: $e")),
       );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -126,15 +196,16 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     ),
                     onPressed:() {
-                      if (_currentPage == 4) {
+                      if (_currentPage == 5) {
                       Navigator.pushNamed(context, '/dashboard');
+                      _submitForm();
                        print("Form Submitted! Navigate to the next page.");
                     } else {
                   _nextPage();
                  }
                },
                     icon: Icon(Icons.arrow_forward, color: Colors.white),
-                    label: Text(_currentPage == 4 ? "Submit" : "Next", style: TextStyle(color: Colors.white, fontSize: 18)),
+                    label: Text(_currentPage == 5 ? "Submit" : "Next", style: TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ],
               ),

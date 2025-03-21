@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindlabryinth/providers/auth_provider.dart';
+import 'package:mindlabryinth/screens/api_service.dart';
 import 'package:mindlabryinth/screens/child_register.dart';
 import 'package:mindlabryinth/screens/dashboard.dart';
 import 'package:mindlabryinth/screens/login_family_screen.dart';
@@ -19,11 +20,10 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => WelcomeScreen(),
         '/familyRegistration': (context) => LoginFamilyScreen(),
         '/staffRegistration': (context) => RegisterStaffScreen(),
-        '/childRegistration': (context) => RegisterChildScreen(),
+        '/childRegistration': (context) => RegisterChildScreen(apiService: ApiService(),),
         '/dashboard': (context) => DashScreen(),
       },
     );
